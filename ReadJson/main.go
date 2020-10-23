@@ -11,20 +11,21 @@ import (
 
 //struck mahasiswa
 type mahasiswas struct {
-	Idmahasiswa string          `json:"Id_mahasiswa"`
-	Nama        string          `json:"nama"`
-	Alamat      []alamatdetails `json:"alamat"`
-	Fakultas    string          `json:"fakultas"`
-	Jurusan     string          `json:"jurusan"`
-	Nilai       []nilaidetails  `json:"nilai"`
+	Idmahasiswa string `json:"Id_mahasiswa"`
+	Nama        string `json:"nama"`
+	Alamat      struct {
+		Jalan     string `json:"jalan"`
+		Kelurahan string `json:"kelurahan"`
+		Kecamatan string `json:"kecamatan"`
+		Kabupaten string `json:"kabupaten"`
+		Provinsi  string `json:"provinsi"`
+	} `json:"alamat"`
+	Fakultas string         `json:"fakultas"`
+	Jurusan  string         `json:"jurusan"`
+	Nilai    []nilaidetails `json:"nilai"`
 }
 
 type alamatdetails struct {
-	Jalan     string `json:"jalan"`
-	Kelurahan string `json:"kelurahan"`
-	Kecamatan string `json:"kecamatan"`
-	Kabupaten string `json:"kabupaten"`
-	Provinsi  string `json:"provinsi"`
 }
 type nilaidetails struct {
 	Namamatkul string `json:"nama"`
@@ -74,13 +75,13 @@ func main() {
 	fmt.Println("Fakultas :", mahasiswa.Fakultas)
 	fmt.Println("Jurusan :", mahasiswa.Jurusan)
 	fmt.Println("Alamat :")
-	for _, alamat := range mahasiswa.Alamat {
-		fmt.Println("Jalan : ", alamat.Jalan)
-		fmt.Println("Kelurahan : ", alamat.Kelurahan)
-		fmt.Println("Kecamatan : ", alamat.Kecamatan)
-		fmt.Println("Kabupaten : ", alamat.Kabupaten)
-		fmt.Println("Provinsi : ", alamat.Provinsi)
-	}
+
+	fmt.Println("Jalan : ", mahasiswa.Alamat.Jalan)
+	fmt.Println("Kelurahan : ", mahasiswa.Alamat.Kelurahan)
+	fmt.Println("Kecamatan : ", mahasiswa.Alamat.Kecamatan)
+	fmt.Println("Kabupaten : ", mahasiswa.Alamat.Kabupaten)
+	fmt.Println("Provinsi : ", mahasiswa.Alamat.Provinsi)
+
 	for _, nilai := range mahasiswa.Nilai {
 		fmt.Println("Nama Matkul : ", nilai.Namamatkul)
 		fmt.Println("Nilai : ", nilai.Nilai)

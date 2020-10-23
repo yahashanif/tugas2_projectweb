@@ -17,12 +17,18 @@ var err error
 
 //struck mahasiswa
 type mahasiswas struct {
-	Idmahasiswa string          `json:"Id_mahasiswa"`
-	Nama        string          `json:"nama"`
-	Alamat      []alamatdetails `json:"alamat"`
-	Fakultas    string          `json:"fakultas"`
-	Jurusan     string          `json:"jurusan"`
-	Nilai       []nilaidetails  `json:"nilai"`
+	Idmahasiswa string `json:"Id_mahasiswa"`
+	Nama        string `json:"nama"`
+	Alamat      struct {
+		Jalan     string `json:"jalan"`
+		Kelurahan string `json:"kelurahan"`
+		Kecamatan string `json:"kecamatan"`
+		Kabupaten string `json:"kabupaten"`
+		Provinsi  string `json:"provinsi"`
+	} `json:"alamat"`
+	Fakultas string         `json:"fakultas"`
+	Jurusan  string         `json:"jurusan"`
+	Nilai    []nilaidetails `json:"nilai"`
 }
 
 type alamatdetails struct {
@@ -41,16 +47,19 @@ type nilaidetails struct {
 func getMahasiswa(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var mahasiswa mahasiswas
-	var alamatdet alamatdetails
 	var nilaidet nilaidetails
-
 	params := mux.Vars(r)
 
 	sql := `select
 				mahasiswa.id_mahasiswa,
 				mahasiswa.nama,
 				fakultas.nama as fakultas,
-				jurusan.nama as jurusan
+				jurusan.nama as jurusan,
+				mahasiswa.jalan,
+				mahasiswa.kelurahan,
+				mahasiswa.kecamatan,
+				mahasiswa.kabupaten,
+				mahasiswa.provinsi 
 				FROM
 				mahasiswa.mahasiswa
 				INNER JOIN mahasiswa.fakultas
@@ -65,38 +74,11 @@ func getMahasiswa(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for result.Next() {
-		err := result.Scan(&mahasiswa.Idmahasiswa, &mahasiswa.Nama, &mahasiswa.Fakultas, &mahasiswa.Jurusan)
-
-		if err != nil {
-			panic(err.Error())
-		}
-
-		sqlalamat := `select mahasiswa.jalan,
-							mahasiswa.kelurahan,
-							mahasiswa.kecamatan,
-							mahasiswa.kabupaten,
-							mahasiswa.provinsi 
-							from mahasiswa where id_mahasiswa = ?`
+		err := result.Scan(&mahasiswa.Idmahasiswa, &mahasiswa.Nama, &mahasiswa.Fakultas, &mahasiswa.Jurusan,
+			&mahasiswa.Alamat.Jalan, &mahasiswa.Alamat.Kelurahan, &mahasiswa.Alamat.Kecamatan, &mahasiswa.Alamat.Kabupaten, &mahasiswa.Alamat.Provinsi)
 
 		Idmahasiswa := &mahasiswa.Idmahasiswa
 
-		resultAlamat, errAlm := db.Query(sqlalamat, *Idmahasiswa)
-
-		defer resultAlamat.Close()
-
-		if errAlm != nil {
-			panic(err.Error())
-		}
-
-		for resultAlamat.Next() {
-			err := resultAlamat.Scan(&alamatdet.Jalan, &alamatdet.Kelurahan, &alamatdet.Kecamatan, &alamatdet.Kabupaten, &alamatdet.Provinsi)
-
-			if err != nil {
-				panic(err.Error())
-			}
-
-			mahasiswa.Alamat = append(mahasiswa.Alamat, alamatdet)
-		}
 		if err != nil {
 			panic(err.Error())
 		}
